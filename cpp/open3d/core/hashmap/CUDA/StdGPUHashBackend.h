@@ -210,14 +210,14 @@ __global__ void STDGPUFindKernel(InternalStdGPUHashBackend<Key, Hash, Eq> map,
                                  buf_index_t* output_buf_indices,
                                  bool* output_masks,
                                  int64_t count) {
-    // uint32_t tid = threadIdx.x + blockIdx.x * blockDim.x;
-    // if (tid >= count) return;
+    uint32_t tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid >= count) return;
 
-    // Key key = input_keys[tid];
-    // auto iter = map.find(key);
-    // bool flag = (iter != map.end());
-    // output_masks[tid] = flag;
-    // output_buf_indices[tid] = flag ? iter->second : 0;
+    Key key = input_keys[tid];
+    auto iter = map.find(key);
+    bool flag = (iter != map.end());
+    output_masks[tid] = flag;
+    output_buf_indices[tid] = flag ? iter->second : 0;
 }
 
 template <typename Key, typename Hash, typename Eq>
