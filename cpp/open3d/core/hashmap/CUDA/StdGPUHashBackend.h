@@ -166,7 +166,10 @@ public:
     std::vector<int64_t> BucketSizes() const override;
     float LoadFactor() const override;
 
-    InternalStdGPUHashBackend<Key, Hash, Eq> GetImpl() const { return impl_; }
+    InternalStdGPUHashBackend<Key, Hash, Eq>* GetImplPtr() {
+        InternalStdGPUHashBackend<Key, Hash, Eq>* impl_ptr = &impl_;
+        return impl_ptr;
+    }
 
     void Allocate(int64_t capacity);
     void Free();

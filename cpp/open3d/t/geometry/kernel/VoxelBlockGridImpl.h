@@ -558,7 +558,7 @@ void RayCastCPU
         utility::LogError(
                 "Unsupported backend: CUDA raycasting only supports STDGPU.");
     }
-    auto hashmap_impl = cuda_hashmap->GetImpl();
+    auto hashmap_impl_ptr = cuda_hashmap->GetImplPtr();
 #else
     auto cpu_hashmap =
             std::dynamic_pointer_cast<core::TBBHashBackend<Key, Hash, Eq>>(
@@ -567,7 +567,7 @@ void RayCastCPU
         utility::LogError(
                 "Unsupported backend: CPU raycasting only supports TBB.");
     }
-    auto hashmap_impl = *cpu_hashmap->GetImpl();
+    auto hashmap_impl_ptr = cpu_hashmap->GetImplPtr();
 #endif
 
     core::Device device = hashmap->GetDevice();
@@ -693,8 +693,8 @@ void RayCastCPU
 
                 index_t block_buf_idx = cache.Check(key[0], key[1], key[2]);
                 if (block_buf_idx < 0) {
-                    auto iter = hashmap_impl.find(key);
-                    if (iter == hashmap_impl.end()) return -1;
+                    auto iter = hashmap_impl_ptr->find(key);
+                    if (iter == hashmap_impl_ptr->end()) return -1;
                     block_buf_idx = iter->second;
                     cache.Update(key[0], key[1], key[2], block_buf_idx);
                 }
@@ -720,8 +720,8 @@ void RayCastCPU
             Key key(x_b, y_b, z_b);
             index_t block_buf_idx = cache.Check(x_b, y_b, z_b);
             if (block_buf_idx < 0) {
-                auto iter = hashmap_impl.find(key);
-                if (iter == hashmap_impl.end()) return -1;
+                auto iter = hashmap_impl_ptr->find(key);
+                if (iter == hashmap_impl_ptr->end()) return -1;
                 block_buf_idx = iter->second;
                 cache.Update(x_b, y_b, z_b, block_buf_idx);
             }
@@ -919,8 +919,8 @@ void RayCastCPU
 
             index_t block_buf_idx = cache.Check(x_b, y_b, z_b);
             if (block_buf_idx < 0) {
-                auto iter = hashmap_impl.find(key);
-                if (iter == hashmap_impl.end()) return;
+                auto iter = hashmap_impl_ptr->find(key);
+                if (iter == hashmap_impl_ptr->end()) return;
                 block_buf_idx = iter->second;
                 cache.Update(x_b, y_b, z_b, block_buf_idx);
             }

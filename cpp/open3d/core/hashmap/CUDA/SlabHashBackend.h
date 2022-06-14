@@ -70,7 +70,10 @@ public:
     std::vector<int64_t> BucketSizes() const override;
     float LoadFactor() const override;
 
-    SlabHashBackendImpl<Key, Hash, Eq> GetImpl() { return impl_; }
+    SlabHashBackendImpl<Key, Hash, Eq>* GetImplPtr() {
+        SlabHashBackendImpl<Key, Hash, Eq>* impl_ptr = &impl_;
+        return impl_ptr;
+    }
 
     void Allocate(int64_t capacity) override;
     void Free() override;
