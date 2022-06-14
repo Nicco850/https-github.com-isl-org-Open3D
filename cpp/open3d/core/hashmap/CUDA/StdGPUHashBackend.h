@@ -210,14 +210,14 @@ __global__ void STDGPUFindKernel(InternalStdGPUHashBackend<Key, Hash, Eq> map,
                                  buf_index_t* output_buf_indices,
                                  bool* output_masks,
                                  int64_t count) {
-    uint32_t tid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (tid >= count) return;
+    // uint32_t tid = threadIdx.x + blockIdx.x * blockDim.x;
+    // if (tid >= count) return;
 
-    Key key = input_keys[tid];
-    auto iter = map.find(key);
-    bool flag = (iter != map.end());
-    output_masks[tid] = flag;
-    output_buf_indices[tid] = flag ? iter->second : 0;
+    // Key key = input_keys[tid];
+    // auto iter = map.find(key);
+    // bool flag = (iter != map.end());
+    // output_masks[tid] = flag;
+    // output_buf_indices[tid] = flag ? iter->second : 0;
 }
 
 template <typename Key, typename Hash, typename Eq>
@@ -242,21 +242,21 @@ __global__ void STDGPUEraseKernel(InternalStdGPUHashBackend<Key, Hash, Eq> map,
                                   buf_index_t* output_buf_indices,
                                   bool* output_masks,
                                   int64_t count) {
-    uint32_t tid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (tid >= count) return;
+    // uint32_t tid = threadIdx.x + blockIdx.x * blockDim.x;
+    // if (tid >= count) return;
 
-    Key key = input_keys[tid];
-    auto iter = map.find(key);
-    bool flag = (iter != map.end());
-    output_masks[tid] = flag;
-    output_buf_indices[tid] = flag ? iter->second : 0;
+    // Key key = input_keys[tid];
+    // auto iter = map.find(key);
+    // bool flag = (iter != map.end());
+    // output_masks[tid] = flag;
+    // output_buf_indices[tid] = flag ? iter->second : 0;
 
-    if (output_masks[tid]) {
-        output_masks[tid] = map.erase(key);
-        if (output_masks[tid]) {
-            buffer_accessor.DeviceFree(output_buf_indices[tid]);
-        }
-    }
+    // if (output_masks[tid]) {
+    //     output_masks[tid] = map.erase(key);
+    //     if (output_masks[tid]) {
+    //         buffer_accessor.DeviceFree(output_buf_indices[tid]);
+    //     }
+    // }
 }
 
 template <typename Key, typename Hash, typename Eq>
@@ -381,26 +381,26 @@ void StdGPUHashBackend<Key, Hash, Eq>::Insert(
         buf_index_t* output_buf_indices,
         bool* output_masks,
         int64_t count) {
-    uint32_t threads = 128;
-    uint32_t blocks = (count + threads - 1) / threads;
+    // uint32_t threads = 128;
+    // uint32_t blocks = (count + threads - 1) / threads;
 
-    thrust::device_vector<const void*> input_values_soa_device(
-            input_values_soa.begin(), input_values_soa.end());
+    // thrust::device_vector<const void*> input_values_soa_device(
+    //         input_values_soa.begin(), input_values_soa.end());
 
-    int64_t n_values = input_values_soa.size();
-    const void* const* ptr_input_values_soa =
-            thrust::raw_pointer_cast(input_values_soa_device.data());
+    // int64_t n_values = input_values_soa.size();
+    // const void* const* ptr_input_values_soa =
+    //         thrust::raw_pointer_cast(input_values_soa_device.data());
 
-    DISPATCH_DIVISOR_SIZE_TO_BLOCK_T(
-            buffer_accessor_.common_block_size_, [&]() {
-                STDGPUInsertKernel<Key, Hash, Eq, block_t>
-                        <<<blocks, threads, 0, core::cuda::GetStream()>>>(
-                                impl_, buffer_accessor_,
-                                static_cast<const Key*>(input_keys),
-                                ptr_input_values_soa, output_buf_indices,
-                                output_masks, count, n_values);
-            });
-    cuda::Synchronize(this->device_);
+    // DISPATCH_DIVISOR_SIZE_TO_BLOCK_T(
+    //         buffer_accessor_.common_block_size_, [&]() {
+    //             STDGPUInsertKernel<Key, Hash, Eq, block_t>
+    //                     <<<blocks, threads, 0, core::cuda::GetStream()>>>(
+    //                             impl_, buffer_accessor_,
+    //                             static_cast<const Key*>(input_keys),
+    //                             ptr_input_values_soa, output_buf_indices,
+    //                             output_masks, count, n_values);
+    //         });
+    // cuda::Synchronize(this->device_);
 }
 
 template <typename Key, typename Hash, typename Eq>
