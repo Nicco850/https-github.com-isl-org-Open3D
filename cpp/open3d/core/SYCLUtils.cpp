@@ -54,9 +54,9 @@ namespace sycl {
 namespace sy = cl::sycl;
 #endif
 
-#ifdef BUILD_SYCL_MODULE
-SYCL_EXTERNAL void PlusOne(sycl::cl_int *src) { *src += 1; }
-#endif
+// #ifdef BUILD_SYCL_MODULE
+// SYCL_EXTERNAL void PlusOne(sycl::cl_int *src) { *src += 1; }
+// #endif
 
 int SYCLDemo() {
 #ifdef BUILD_SYCL_MODULE
@@ -69,6 +69,8 @@ int SYCLDemo() {
 
     // Size of index space for kernel.
     sy::range<1> num_workloads{buffer.size()};
+
+    auto PlusOne = [](sycl::cl_int *src) { *src += 1; };
 
     // Submitting command group(work) to q.
     q.submit([&](sy::handler &cgh) {
