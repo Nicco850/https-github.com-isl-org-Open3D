@@ -66,52 +66,15 @@ namespace sy = cl::sycl;
 int SYCLDemo() {
 #ifdef BUILD_SYCL_MODULE
     int n = 4;
-    int num_bytes = n * sizeof(int);
 
-    // Malloc.
-    Device host_device("CPU:0");
+    Device cpu_device("CPU:0");
     Device sycl_device("SYCL:0");
-    int *host_buffer =
-            static_cast<int *>(MemoryManager::Malloc(num_bytes, host_device));
-    int *sycl_buffer =
-            static_cast<int *>(MemoryManager::Malloc(num_bytes, sycl_device));
+    core::Tensor src = core::Tensor::Init<float>({0, 1, 2, 3}, cpu_device);
+    core::Tensor dst = src.To(sycl_device);
+    core::Tensor dst2 = dst.To(cpu_device);
+    utility::LogInfo("{}", dst2.ToString());
 
-    // Prepare host buffer.
-    for (int i = 0; i < n; i++) {
-        host_buffer[i] = i;
-    }
-
-    // Copy to device.
-    MemoryManager::Memcpy(sycl_buffer, sycl_device, host_buffer, host_device,
-                          num_bytes);
-
-    // Compute, every element +10.
-    sycl::queue &queue = sycl_utils::GetDefaultQueue(sycl_device);
-    queue.submit([&](sycl::handler &h) {
-             h.parallel_for(n, [=](int i) { sycl_buffer[i] += 10; });
-         }).wait();
-
-    // Copy back to host.
-    MemoryManager::Memcpy(host_buffer, host_device, sycl_buffer, sycl_device,
-                          num_bytes);
-
-    // Check results.
-    bool all_match = true;
-    for (int i = 0; i < n; i++) {
-        if (host_buffer[i] != i + 10) {
-            all_match = false;
-            utility::LogInfo("Mismatch: host_buffer[{}] = {}, expected {}.", i,
-                             host_buffer[i], i + 10);
-        } else {
-            utility::LogInfo("Match: host_buffer[{}] = {}.", i, host_buffer[i]);
-        }
-    }
-
-    // Clean up.
-    MemoryManager::Free(host_buffer, host_device);
-    MemoryManager::Free(sycl_buffer, sycl_device);
-
-    return all_match ? 0 : -1;
+    return 0;
 #else
     utility::LogInfo("SYCLDemo is not compiled with BUILD_SYCL_MODULE=ON.");
     return -1;
