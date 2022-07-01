@@ -38,6 +38,9 @@
 // cmake/Open3DSYCLTargetSources.cmake.
 #if defined(BUILD_SYCL_MODULE) && defined(__OPEN3D_SYCLCC__)
 #include <CL/sycl.hpp>
+#define OPEN3D_SYCL_EXTERNAL SYCL_EXTERNAL
+#else
+#define OPEN3D_SYCL_EXTERNAL
 #endif
 
 #include <vector>
