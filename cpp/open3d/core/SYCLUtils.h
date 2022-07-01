@@ -32,6 +32,10 @@
 
 #pragma once
 
+// __OPEN3D_SYCLCC__ is different from BUILD_SYCL_MODULE. When BUILD_SYCL_MODULE
+// is ON, only files added with open3d_sycl_target_sources will be having SYCL
+// include directories and link with SYCL libraries. For more details, see
+// cmake/Open3DSYCLTargetSources.cmake.
 #ifdef __OPEN3D_SYCLCC__
 #include <CL/sycl.hpp>
 #endif
