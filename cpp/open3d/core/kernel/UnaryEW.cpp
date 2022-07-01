@@ -7,7 +7,7 @@
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
+// in the Sftware without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
@@ -63,27 +63,33 @@ void UnaryEW(const Tensor& src, Tensor& dst, UnaryEWOpCode op_code) {
 }
 
 void Copy(const Tensor& src, Tensor& dst) {
-    // Check shape
+    // Check shape.
     if (!shape_util::CanBeBrocastedToShape(src.GetShape(), dst.GetShape())) {
         utility::LogError("Shape {} can not be broadcasted to {}.",
                           src.GetShape(), dst.GetShape());
     }
 
-    // Disbatch to device
-    Device src_device = src.GetDevice();
-    Device dst_device = dst.GetDevice();
-    if ((!src_device.IsCPU() && !src_device.IsCUDA()) ||
-        (!dst_device.IsCPU() && !dst_device.IsCUDA())) {
-        utility::LogError("Copy: Unimplemented device");
-    }
-    if (src_device.IsCPU() && dst_device.IsCPU()) {
+    // Dispatch to device.
+    if (src.IsCPU() && dst.IsCPU()) {
         CopyCPU(src, dst);
-    } else {
+    } else if (src.IsCUDA() && dst.IsCUDA() || src.IsCPU() && dst.IsCUDA() ||
+               src.IsCUDA() && dst.IsCPU()) {
 #ifdef BUILD_CUDA_MODULE
         CopyCUDA(src, dst);
 #else
         utility::LogError("Not compiled with CUDA, but CUDA device is used.");
 #endif
+    } else if (src.IsSYCL() && dst.IsSYCL() || src.IsCPU() && dst.IsSYCL() ||
+               src.IsSYCL() && dst.IsCPU()) {
+#ifdef BUILD_SYCL_MODULE
+        CopySYCL(src, dst);
+#else
+        utility::LogError("Not compiled with SYCL, but SYCL device is used.");
+#endif
+    } else {
+        utility::LogError("Unimplemented device {} -> {}.",
+                          src.GetDevice().ToString(),
+                          dst.GetDevice().ToString());
     }
 }
 
