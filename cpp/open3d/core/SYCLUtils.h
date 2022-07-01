@@ -32,6 +32,10 @@
 
 #pragma once
 
+#ifdef __OPEN3D_SYCLCC__
+#include <CL/sycl.hpp>
+#endif
+
 #include <vector>
 
 #include "open3d/core/Device.h"

@@ -7,6 +7,13 @@
 # Note: this is not a perfect forwarding to target_sources(), as it only support
 # limited set of arguments. See the example usage below.
 #
+# This is different from CUDA. When BUILD_CUDA_MODULE is ON, all source files
+# will have CUDA include directories and link with CUDA libraries. However,
+# if BUILD_SYCL_MODULE is ON, only the source files that are added with
+# open3d_sycl_target_sources() will have SYCL include directories and link with
+# SYCL libraries. One advantage of this is to speed up recompilation, as ccache
+# cannot cache SYCL compileations for now.
+#
 # Example usage:
 #   open3d_sycl_target_sources(core PRIVATE a.cpp b.cpp)
 #   open3d_sycl_target_sources(core PUBLIC a.cpp b.cpp)
