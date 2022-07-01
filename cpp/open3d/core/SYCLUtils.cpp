@@ -82,6 +82,11 @@ int SYCLDemo() {
                           num_bytes);
 
     // Compute, every element +10.
+    sycl::queue &queue =
+            sycl_utils::SYCLContext::GetInstance().GetDefaultQueue(sycl_device);
+    queue.submit([&](sycl::handler &h) {
+             h.parallel_for(n, [=](int i) { sycl_buffer[i] += 10; });
+         }).wait();
 
     // Copy back to host.
     MemoryManager::Memcpy(host_buffer, host_device, sycl_buffer, sycl_device,
@@ -94,6 +99,8 @@ int SYCLDemo() {
             all_match = false;
             utility::LogInfo("Mismatch: host_buffer[{}] = {}, expected {}.", i,
                              host_buffer[i], i + 10);
+        } else {
+            utility::LogInfo("Match: host_buffer[{}] = {}.", i, host_buffer[i]);
         }
     }
 
