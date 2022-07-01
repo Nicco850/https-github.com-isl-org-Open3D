@@ -38,10 +38,6 @@ namespace open3d {
 namespace core {
 namespace sycl {
 
-sycl::queue &GetDefaultQueue(const Device &device) {
-    return SYCLContext::GetInstance().GetDefaultQueue(device);
-}
-
 SYCLContext &SYCLContext::GetInstance() {
     static thread_local SYCLContext instance;
     return instance;

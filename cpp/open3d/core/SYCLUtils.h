@@ -36,7 +36,7 @@
 // is ON, only files added with open3d_sycl_target_sources will be having SYCL
 // include directories and link with SYCL libraries. For more details, see
 // cmake/Open3DSYCLTargetSources.cmake.
-#ifdef __OPEN3D_SYCLCC__
+#if defined(BUILD_SYCL_MODULE) && defined(__OPEN3D_SYCLCC__)
 #include <CL/sycl.hpp>
 #endif
 
@@ -47,6 +47,11 @@
 namespace open3d {
 namespace core {
 namespace sycl {
+
+#if defined(BUILD_SYCL_MODULE) && defined(__OPEN3D_SYCLCC__)
+/// Get the default SYCL queue given an Open3D device.
+sycl::queue& GetDefaultQueue(const Device& device);
+#endif
 
 /// Runs simple SYCL test program for sanity checks.
 /// \return Retuns 0 if successful.
