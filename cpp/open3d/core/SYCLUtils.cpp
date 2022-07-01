@@ -71,8 +71,7 @@ int SYCLDemo() {
     Device sycl_device("SYCL:0");
     core::Tensor src = core::Tensor::Init<float>({0, 1, 2, 3}, cpu_device);
     core::Tensor dst = src.To(sycl_device);
-    core::Tensor dst2 = dst.To(cpu_device);
-    utility::LogInfo("{}", dst2.ToString());
+    utility::LogInfo("{}", dst.ToString());
 
     return 0;
 #else
