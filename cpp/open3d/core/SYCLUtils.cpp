@@ -44,7 +44,9 @@
 #ifdef BUILD_SYCL_MODULE
 #include <CL/sycl.hpp>
 
+#include "open3d/core/Indexer.h"
 #include "open3d/core/SYCLContext.h"
+#include "open3d/core/Tensor.h"
 #endif
 
 namespace open3d {
@@ -62,6 +64,61 @@ namespace sy = cl::sycl;
 #endif
 
 int SYCLDemo() {
+#ifdef BUILD_SYCL_MODULE
+    int n = 4;
+    int num_bytes = n * sizeof(int);
+
+    // Malloc.
+    Device host_device("CPU:0");
+    Device sycl_device("SYCL:0");
+    int *host_buffer =
+            static_cast<int *>(MemoryManager::Malloc(num_bytes, host_device));
+    int *sycl_buffer =
+            static_cast<int *>(MemoryManager::Malloc(num_bytes, sycl_device));
+
+    // Prepare host buffer.
+    for (int i = 0; i < n; i++) {
+        host_buffer[i] = i;
+    }
+
+    // Copy to device.
+    MemoryManager::Memcpy(sycl_buffer, sycl_device, host_buffer, host_device,
+                          num_bytes);
+
+    // Compute, every element +10.
+    sycl::queue &queue = sycl_utils::GetDefaultQueue(sycl_device);
+    queue.submit([&](sycl::handler &h) {
+             h.parallel_for(n, [=](int i) { sycl_buffer[i] += 10; });
+         }).wait();
+
+    // Copy back to host.
+    MemoryManager::Memcpy(host_buffer, host_device, sycl_buffer, sycl_device,
+                          num_bytes);
+
+    // Check results.
+    bool all_match = true;
+    for (int i = 0; i < n; i++) {
+        if (host_buffer[i] != i + 10) {
+            all_match = false;
+            utility::LogInfo("Mismatch: host_buffer[{}] = {}, expected {}.", i,
+                             host_buffer[i], i + 10);
+        } else {
+            utility::LogInfo("Match: host_buffer[{}] = {}.", i, host_buffer[i]);
+        }
+    }
+
+    // Clean up.
+    MemoryManager::Free(host_buffer, host_device);
+    MemoryManager::Free(sycl_buffer, sycl_device);
+
+    return all_match ? 0 : -1;
+#else
+    utility::LogInfo("SYCLDemo is not compiled with BUILD_SYCL_MODULE=ON.");
+    return -1;
+#endif
+}
+
+int SYCLDemoOld() {
 #ifdef BUILD_SYCL_MODULE
     int n = 4;
     int num_bytes = n * sizeof(int);
