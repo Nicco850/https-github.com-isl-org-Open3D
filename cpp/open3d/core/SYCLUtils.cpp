@@ -38,6 +38,7 @@
 #include <cstdlib>
 #include <sstream>
 
+#include "open3d/core/MemoryManager.h"
 #include "open3d/utility/Logging.h"
 
 #ifdef BUILD_SYCL_MODULE
@@ -60,50 +61,47 @@ namespace sy = cl::sycl;
 
 int SYCLDemo() {
 #ifdef BUILD_SYCL_MODULE
-    // Ref: https://intel.github.io/llvm-docs/GetStartedGuide.html
-    // Creating buffer of 4 ints to be used inside the kernel code.
-    sy::buffer<sy::cl_int, 1> buffer(4);
+    int n = 4;
+    int num_bytes = n * sizeof(int);
 
-    // Creating SYCL queue.
-    sy::queue q;
+    // Malloc.
+    Device host_device("CPU:0");
+    Device sycl_device("SYCL:0");
+    int *host_buffer =
+            static_cast<int *>(MemoryManager::Malloc(num_bytes, host_device));
+    int *sycl_buffer =
+            static_cast<int *>(MemoryManager::Malloc(num_bytes, sycl_device));
 
-    // Size of index space for kernel.
-    sy::range<1> num_workloads{buffer.size()};
+    // Prepare host buffer.
+    for (int i = 0; i < n; i++) {
+        host_buffer[i] = i;
+    }
 
-    auto PlusOne = [](sycl::cl_int *src) { *src += 1; };
+    // Copy to device.
+    MemoryManager::Memcpy(sycl_buffer, sycl_device, host_buffer, host_device,
+                          num_bytes);
 
-    // Submitting command group(work) to q.
-    q.submit([&](sy::handler &cgh) {
-        // Getting write only access to the buffer on a device.
-        auto accessor = buffer.get_access<sy::access::mode::write>(cgh);
-        // Execute kernel.
-        cgh.parallel_for<class FillBuffer>(num_workloads, [=](sy::id<1> WIid) {
-            // Fill buffer with indexes.
-            accessor[WIid] = (sy::cl_int)WIid.get(0);
-        });
-    });
+    // Compute, every element +10.
 
-    // Getting read only access to the buffer on the host.
-    // Implicit barrier waiting for q to complete the work.
-    const auto host_accessor = buffer.get_access<sy::access::mode::read>();
+    // Copy back to host.
+    MemoryManager::Memcpy(host_buffer, host_device, sycl_buffer, sycl_device,
+                          num_bytes);
 
-    // Check the results.
-    bool mismatch_found = false;
-    for (size_t i = 0; i < buffer.size(); ++i) {
-        if (host_accessor[i] != i) {
-            utility::LogInfo("Mismatch found at index {}: expected {}, got {}.",
-                             i, i, host_accessor[i]);
-            mismatch_found = true;
+    // Check results.
+    bool all_match = true;
+    for (int i = 0; i < n; i++) {
+        if (host_buffer[i] != i + 10) {
+            all_match = false;
+            utility::LogInfo("Mismatch: host_buffer[{}] = {}, expected {}.", i,
+                             host_buffer[i], i + 10);
         }
     }
 
-    if (mismatch_found) {
-        utility::LogInfo("SYCLDemo failed!");
-        return -1;
-    } else {
-        utility::LogInfo("SYCLDemo passed!");
-        return 0;
-    }
+    // Clean up.
+    MemoryManager::Free(host_buffer, host_device);
+    MemoryManager::Free(sycl_buffer, sycl_device);
+
+    return all_match ? 0 : -1;
 #else
     utility::LogInfo("SYCLDemo is not compiled with BUILD_SYCL_MODULE=ON.");
     return -1;
