@@ -52,8 +52,9 @@ namespace core {
 namespace sycl {
 
 #if defined(BUILD_SYCL_MODULE) && defined(__OPEN3D_SYCLCC__)
+namespace sy = cl::sycl;
 /// Get the default SYCL queue given an Open3D device.
-sycl::queue& GetDefaultQueue(const Device& device);
+sy::queue& GetDefaultQueue(const Device& device);
 #endif
 
 /// Runs simple SYCL test program for sanity checks.

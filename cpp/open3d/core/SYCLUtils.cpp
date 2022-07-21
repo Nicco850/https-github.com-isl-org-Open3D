@@ -54,13 +54,10 @@ namespace core {
 namespace sycl {
 
 #if defined(BUILD_SYCL_MODULE)
-sycl::queue &GetDefaultQueue(const Device &device) {
+namespace sy = cl::sycl;
+sy::queue &GetDefaultQueue(const Device &device) {
     return SYCLContext::GetInstance().GetDefaultQueue(device);
 }
-#endif
-
-#ifdef BUILD_SYCL_MODULE
-namespace sy = cl::sycl;
 #endif
 
 int SYCLDemo() {
@@ -103,7 +100,7 @@ int SYCLDemoOld() {
                           num_bytes);
 
     // Compute, every element +10.
-    sycl::queue &queue = sycl_utils::GetDefaultQueue(sycl_device);
+    sy::queue &queue = sycl::GetDefaultQueue(sycl_device);
     queue.submit([&](sy::handler &h) {
              h.parallel_for(n, [=](int i) { sycl_buffer[i] += 10; });
          }).wait();
