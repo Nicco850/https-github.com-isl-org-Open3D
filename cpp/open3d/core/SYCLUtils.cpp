@@ -104,7 +104,7 @@ int SYCLDemoOld() {
 
     // Compute, every element +10.
     sycl::queue &queue = sycl_utils::GetDefaultQueue(sycl_device);
-    queue.submit([&](sycl::handler &h) {
+    queue.submit([&](sy::handler &h) {
              h.parallel_for(n, [=](int i) { sycl_buffer[i] += 10; });
          }).wait();
 
