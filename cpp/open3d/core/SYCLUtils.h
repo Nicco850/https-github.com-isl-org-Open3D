@@ -38,6 +38,7 @@
 // cmake/Open3DSYCLTargetSources.cmake.
 #if defined(BUILD_SYCL_MODULE) && defined(__OPEN3D_SYCLCC__)
 #include <CL/sycl.hpp>
+namespace sy = cl::sycl;
 #define OPEN3D_SYCL_EXTERNAL SYCL_EXTERNAL
 #else
 #define OPEN3D_SYCL_EXTERNAL
@@ -52,7 +53,6 @@ namespace core {
 namespace sycl {
 
 #if defined(BUILD_SYCL_MODULE) && defined(__OPEN3D_SYCLCC__)
-namespace sy = cl::sycl;
 /// Get the default SYCL queue given an Open3D device.
 sy::queue& GetDefaultQueue(const Device& device);
 #endif

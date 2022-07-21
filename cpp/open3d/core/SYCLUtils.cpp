@@ -54,7 +54,6 @@ namespace core {
 namespace sycl {
 
 #if defined(BUILD_SYCL_MODULE)
-namespace sy = cl::sycl;
 sy::queue &GetDefaultQueue(const Device &device) {
     return SYCLContext::GetInstance().GetDefaultQueue(device);
 }

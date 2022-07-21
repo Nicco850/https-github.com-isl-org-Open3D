@@ -33,16 +33,14 @@
 
 #pragma once
 
-#include <CL/sycl.hpp>
 #include <unordered_map>
 
 #include "open3d/core/Device.h"
+#include "open3d/core/SYCLUtils.h"
 
 namespace open3d {
 namespace core {
 namespace sycl {
-
-namespace sy = cl::sycl;
 
 /// Singleton SYCL context manager. It maintains:
 /// - A default queue for each SYCL device
