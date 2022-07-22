@@ -74,6 +74,13 @@ void BinaryEWCUDA(const Tensor& lhs,
                   BinaryEWOpCode op_code);
 #endif
 
+#ifdef BUILD_SYCL_MODULE
+void BinaryEWSYCL(const Tensor& lhs,
+                  const Tensor& rhs,
+                  Tensor& dst,
+                  BinaryEWOpCode op_code);
+#endif
+
 }  // namespace kernel
 }  // namespace core
 }  // namespace open3d
