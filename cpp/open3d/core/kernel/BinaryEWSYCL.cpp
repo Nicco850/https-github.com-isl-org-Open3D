@@ -397,14 +397,12 @@ void BinaryEWSYCL(const Tensor& lhs,
 #ifdef BUILD_ISPC_MODULE
         ispc::Indexer ispc_indexer = indexer.ToISPC();
 #endif
-        DISPATCH_DTYPE_TO_TEMPLATE(src_dtype, [&]() {
+        DISPATCH_DTYPE_TO_TEMPLATE_NO_DOUBLE(src_dtype, [&]() {
             switch (op_code) {
                 case BinaryEWOpCode::Add:
-                    // LaunchBinaryEWKernel<scalar_t, scalar_t>(
-                    //         indexer, CPUAddElementKernel<scalar_t>,
-                    //         OPEN3D_TEMPLATE_VECTORIZED(scalar_t,
-                    //                                    CPUAddElementKernel,
-                    //                                    &ispc_indexer));
+                    std::cout << "lhs: " <<  lhs.GetDtype().ToString() << std::endl;
+                    std::cout << "rhs: " <<  rhs.GetDtype().ToString() << std::endl;
+                    std::cout << "dst: " <<  dst.GetDtype().ToString() << std::endl;
                     LaunchBinaryEWKernelSYCL<scalar_t, scalar_t>(
                             indexer, lhs.GetDevice(),
                             CPUAddElementKernel<scalar_t>);

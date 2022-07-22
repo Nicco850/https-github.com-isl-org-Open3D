@@ -64,14 +64,14 @@ sy::queue &SYCLContext::GetDefaultQueue(const Device &device) {
 SYCLContext::SYCLContext() {
     // SYCL GPU.
     // TODO: Currently we only support one GPU device.
-    try {
-        const sy::device &sycl_device = sy::device(sy::gpu_selector());
-        const Device open3d_device = Device("SYCL:0");
-        devices_.push_back(open3d_device);
-        device_to_sycl_device_[open3d_device] = sycl_device;
-        device_to_default_queue_[open3d_device] = sy::queue(sycl_device);
-    } catch (const sy::exception &e) {
-    }
+    // try {
+    //     const sy::device &sycl_device = sy::device(sy::gpu_selector());
+    //     const Device open3d_device = Device("SYCL:0");
+    //     devices_.push_back(open3d_device);
+    //     device_to_sycl_device_[open3d_device] = sycl_device;
+    //     device_to_default_queue_[open3d_device] = sy::queue(sycl_device);
+    // } catch (const sy::exception &e) {
+    // }
 
     if (devices_.size() == 0) {
         // SYCL CPU fallback.

@@ -83,6 +83,16 @@
         }                                                \
     }()
 
+#define DISPATCH_DTYPE_TO_TEMPLATE_NO_DOUBLE(DTYPE, ...) \
+    [&] {                                                \
+        if (DTYPE == open3d::core::Float32) {            \
+            using scalar_t = float;                      \
+            return __VA_ARGS__();                        \
+        } else {                                         \
+            utility::LogError("Unsupported data type."); \
+        }                                                \
+    }()
+
 #define DISPATCH_DTYPE_TO_TEMPLATE_WITH_BOOL(DTYPE, ...)    \
     [&] {                                                   \
         if (DTYPE == open3d::core::Bool) {                  \

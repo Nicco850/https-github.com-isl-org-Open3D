@@ -76,6 +76,12 @@ void BinaryEW(const Tensor& lhs,
 #else
         utility::LogError("Not compiled with CUDA, but CUDA device is used.");
 #endif
+    } else if (lhs.IsSYCL()) {
+#ifdef BUILD_SYCL_MODULE
+        BinaryEWSYCL(lhs, rhs, dst, op_code);
+#else
+        utility::LogError("Not compiled with SYCL, but SYCL device is used.");
+#endif
     } else {
         utility::LogError("BinaryEW: Unimplemented device");
     }
