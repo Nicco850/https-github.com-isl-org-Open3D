@@ -28,7 +28,7 @@ target_sources(core PRIVATE
     kernel/Arange.cpp
     kernel/ArangeCPU.cpp
     kernel/BinaryEW.cpp
-    kernel/BinaryEWCPU.cpp
+
     kernel/IndexGetSet.cpp
     kernel/IndexGetSetCPU.cpp
     kernel/Kernel.cpp
@@ -65,6 +65,7 @@ target_sources(core PRIVATE
 
 open3d_sycl_target_sources(core PRIVATE
     SYCLUtils.cpp
+    kernel/BinaryEWCPU.cpp
 )
 
 if (BUILD_SYCL_MODULE)
